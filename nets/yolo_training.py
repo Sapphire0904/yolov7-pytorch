@@ -448,7 +448,9 @@ class YOLOLoss(nn.Module):
             #   将先验框除以stride，获得相对于特征层的先验框。
             #   anchors_i [num_anchor, 2]
             #----------------------------------------------------#
-            anchors_i = torch.from_numpy(self.anchors[i] / self.stride[i]).type_as(predictions[i])
+            # anchors_i = torch.from_numpy(self.anchors[i] / self.stride[i]).type_as(predictions[i])
+            anchors_i, shape = \
+                torch.from_numpy(self.anchors[i] / self.stride[i]).type_as(predictions[i]), predictions[i].shape
             #-------------------------------------------#
             #   计算获得对应特征层的高宽
             #-------------------------------------------#
@@ -510,7 +512,8 @@ class YOLOLoss(nn.Module):
             #   a代表属于该特征点的第几个先验框
             #-------------------------------------------#
             a = t[:, 6].long()  # anchor indices
-            indices.append((b, a, gj.clamp_(0, gain[3] - 1), gi.clamp_(0, gain[2] - 1)))  # image, anchor, grid indices
+            # indices.append((b, a, gj.clamp_(0, gain[3] - 1), gi.clamp_(0, gain[2] - 1)))  # image, anchor, grid indices
+            indices.append((b, a, gj.clamp_(0, shape[2] - 1), gi.clamp_(0, shape[3] - 1)))
             anchors.append(anchors_i[a])  # anchors
 
         return indices, anchors
